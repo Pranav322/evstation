@@ -73,7 +73,7 @@ function App() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen w-full bg-gradient-to-br from-blue-100 to-green-100 flex flex-col items-center justify-center p-8"
+      className="min-h-screen w-full bg-gradient-to-br from-blue-400 to-green-400 flex flex-col items-center justify-center p-8"
     >
       <motion.div
         initial={{ opacity: 0, y: -50 }}
@@ -87,27 +87,20 @@ function App() {
             <img
               src={myImage}
               alt="Electric Car"
-              className="w-full h-auto"
+              className="w-full h-auto rounded-lg shadow-md"
             />
           </div>
           <div className="w-full md:w-1/2 space-y-4">
             <div className="bg-gray-100 rounded-lg p-4">
               <h2 className="text-xl font-semibold mb-2">Battery Status</h2>
-              <div className="w-full bg-gray-300 rounded-full h-4">
+              <div className="w-full bg-gray-300 rounded-full h-6">
                 <div
-                  className="bg-green-500 rounded-full h-4"
+                  className="bg-green-500 rounded-full h-6 flex items-center justify-end pr-2 text-white font-bold transition-all duration-500 ease-in-out"
                   style={{ width: `${batteryLevel}%` }}
-                ></div>
+                >
+                  {batteryLevel}%
+                </div>
               </div>
-              <p className="text-right mt-1">{batteryLevel}%</p>
-            </div>
-            <div className="bg-gray-100 rounded-lg p-4">
-              <h2 className="text-xl font-semibold mb-2">Range</h2>
-              <p className="text-3xl font-bold text-blue-600">{Math.round(batteryLevel * 3.5)} km</p>
-            </div>
-            <div className="bg-gray-100 rounded-lg p-4">
-              <h2 className="text-xl font-semibold mb-2">Next Service</h2>
-              <p className="text-lg">In 3 months or 5,000 km</p>
             </div>
           </div>
         </div>

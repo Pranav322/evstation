@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ethers } from 'ethers'
 import './App.css'
@@ -17,10 +17,13 @@ function App() {
   const [isCharging, setIsCharging] = useState(false)
   const [batteryLevel, setBatteryLevel] = useState(75)
 
+  
+
   const connectWallet = async () => {
     if (typeof window.ethereum !== 'undefined') {
       try {
         await window.ethereum.request({ method: 'eth_requestAccounts' })
+
         const provider = new ethers.BrowserProvider(window.ethereum)
         const signer = await provider.getSigner()
         const address = await signer.getAddress()
@@ -68,20 +71,64 @@ function App() {
     setChargeUnits(0)
   }
 
+  const renderBattery = () => {
+    const cells = 10
+    const filledCells = Math.floor((batteryLevel / 100) * cells)
+    const partialFill = (batteryLevel / 100) * cells - filledCells
+    
+    return (
+      <div className="w-full max-w-sm mx-auto">
+        <div className="bg-gray-300 rounded-lg p-2">
+          <div className="flex">
+            {[...Array(cells)].map((_, index) => {
+              const isFilled = index < filledCells
+              const isPartiallyFilled = index === filledCells && partialFill > 0
+              const fillPercentage = isPartiallyFilled ? partialFill * 100 : 0
+              
+              return (
+                <motion.div
+                  key={index}
+                  className={`h-8 w-full rounded-sm overflow-hidden ${
+                    index === 0 ? 'rounded-l-md' : ''
+                  } ${
+                    index === cells - 1 ? 'rounded-r-md' : ''
+                  } ${isFilled ? 'bg-green-500' : 'bg-gray-400'}`}
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: index * 0.05 }}
+                >
+                  {isPartiallyFilled && (
+                    <div 
+                      className="h-full bg-green-500" 
+                      style={{ width: `${fillPercentage}%` }}
+                    />
+                  )}
+                </motion.div>
+              )
+            })}
+          </div>
+        </div>
+        <div className="text-center mt-2 text-white font-bold text-lg">
+          {batteryLevel}%
+        </div>
+      </div>
+    )
+  }
+
   const renderDashboard = () => (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen w-full bg-gradient-to-br from-blue-400 to-green-400 flex flex-col items-center justify-center p-8"
+      className="min-h-screen w-full bg-gray-950 flex flex-col items-center justify-center p-8 relative overflow-hidden"
     >
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white rounded-2xl shadow-2xl p-8 mb-8 w-full max-w-3xl"
+        className="bg-gray-800 rounded-2xl shadow-2xl p-8 mb-8 w-full max-w-3xl z-10"
       >
-        <h1 className="text-4xl font-bold mb-6 text-center text-gray-800">Your EV Dashboard</h1>
+        <h1 className="text-4xl font-bold mb-6 text-center text-white">Your EV Dashboard</h1>
         <div className="flex flex-col md:flex-row items-center justify-between">
           <div className="w-full md:w-1/2 mb-6 md:mb-0">
             <img
@@ -91,22 +138,15 @@ function App() {
             />
           </div>
           <div className="w-full md:w-1/2 space-y-4">
-            <div className="bg-gray-100 rounded-lg p-4">
-              <h2 className="text-xl font-semibold mb-2">Battery Status</h2>
-              <div className="w-full bg-gray-300 rounded-full h-6">
-                <div
-                  className="bg-green-500 rounded-full h-6 flex items-center justify-end pr-2 text-white font-bold transition-all duration-500 ease-in-out"
-                  style={{ width: `${batteryLevel}%` }}
-                >
-                  {batteryLevel}%
-                </div>
-              </div>
+            <div className="bg-gray-700 rounded-lg p-4">
+              <h2 className="text-xl font-semibold mb-2 text-white">Battery Status</h2>
+              {renderBattery()}
             </div>
           </div>
         </div>
       </motion.div>
 
-      <div className="flex space-x-4 mb-8">
+      <div className="flex space-x-4 mb-8 z-10">
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -133,7 +173,7 @@ function App() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
         >
           <motion.div
             initial={{ scale: 0.9 }}
